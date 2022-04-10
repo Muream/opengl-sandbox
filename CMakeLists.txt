@@ -10,9 +10,10 @@ option(GLFW_BUILD_TESTS OFF)
 add_subdirectory(vendor/GLFW)
 
 include_directories(
-    vendor/glad/include
-    vendor/GLFW/include
     vendor
+    vendor/GLFW/include
+    vendor/glad/include
+    vendor/glm
 )
 
 file(GLOB_RECURSE PROJECT_HEADERS LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.h)
