@@ -46,3 +46,4 @@ unsigned int Application::get_height() { return height; }
 
 GLFWwindow *Application::get_window() { return window; }
 
+Scene &Application::get_scene() { return scene; }

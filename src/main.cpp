@@ -34,6 +34,8 @@ int main(void) {
         };
         Mesh mesh(vertices, indices);
 
+        app.get_scene().add_mesh(mesh);
+
         glm::mat4 projectionMatrix = glm::ortho(
             -(float)app.get_width() / 200.0f, (float)app.get_width() / 200.0f,
             -(float)app.get_height() / 200.0f, (float)app.get_height() / 200.0f, -1.0f,
@@ -50,7 +52,9 @@ int main(void) {
         while (!glfwWindowShouldClose(app.get_window())) {
             renderer.clear(0.1, 0.1, 0.1);
 
-            renderer.draw(mesh, shader);
+            for (auto &mesh : app.get_scene().get_meshes()) {
+                renderer.draw(mesh, shader);
+            }
 
             /* Swap front and back buffers */
             glfwSwapBuffers(app.get_window());

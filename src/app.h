@@ -12,9 +12,11 @@ class Application {
     unsigned int get_width();
     unsigned int get_height();
     GLFWwindow *get_window();
+    Scene &get_scene();
 
   private:
     unsigned int width;
     unsigned int height;
     GLFWwindow *window;
+    Scene scene;
 };
