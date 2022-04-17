@@ -2,12 +2,14 @@
 #include <glad/glad.h>
 #include <vector>
 
+#include "vertex.h"
+
 class VertexBuffer {
 private:
-	unsigned int rendererID;
+	unsigned int renderer_id;
 
 public:
-	VertexBuffer(const void* data, unsigned int size);
+	VertexBuffer(std::vector<Vertex>);
 	~VertexBuffer();
 
 	void bind() const;

@@ -4,95 +4,56 @@
 
 #include <glad/glad.h>
 
-#include <GLFW/glfw3.h>
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "GLUtils.h"
-#include "IndexBuffer.h"
-#include "Renderer.h"
-#include "Shader.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
+#include "app.h"
+
+#include "index_buffer.h"
+#include "mesh.h"
+#include "renderer.h"
+#include "shader.h"
+#include "vertex.h"
+#include "vertex_array.h"
+#include "vertex_buffer.h"
 
 int main(void) {
-    glfwSetErrorCallback([](int error, const char *description) {
-        fprintf(stderr, "Error: %s\n", description);
-    });
-
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow *window;
-
-    unsigned int SCREEN_WIDTH = 1280;
-    unsigned int SCREEN_HEIGHT = 720;
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL Sandbox", nullptr,
-                              nullptr);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    gladLoadGL();
-
-    glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+    Application app(1280, 720);
 
     // Create a scope to delete OpenGL Objects before the context gets invalid
     {
-
-        float vertices[] = {
-            0.5f,  0.5f,  0.0f, // top right
-            0.5f,  -0.5f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, // bottom left
-            -0.5f, 0.5f,  0.0f  // top left
+        std::vector<Vertex> vertices = {
+            Vertex{glm::vec3(0.5f, 0.5f, 0.0f)},   // top right
+            Vertex{glm::vec3(0.5f, -0.5f, 0.0f)},  // bottom right
+            Vertex{glm::vec3(-0.5f, -0.5f, 0.0f)}, // bottom left
+            Vertex{glm::vec3(-0.5f, 0.5f, 0.0f)}   // top left
         };
-
-        unsigned int indices[] = {
+        std::vector<unsigned int> indices = {
             0, 1, 3, // first triangle
             1, 2, 3  // second triangle
         };
-
-        VertexBuffer vertexBuffer(vertices, 4 * 3 * sizeof(float));
-        VertexBufferLayout layout;
-
-        VertexArray vertexArray;
-        layout.push<float>(3);
-        vertexArray.addBuffer(vertexBuffer, layout);
-
-        IndexBuffer indexBuffer(indices, 6);
+        Mesh mesh(vertices, indices);
 
         glm::mat4 projectionMatrix = glm::ortho(
-            -(float)SCREEN_WIDTH / 200.0f, (float)SCREEN_WIDTH / 200.0f,
-            -(float)SCREEN_HEIGHT / 200.0f, (float)SCREEN_HEIGHT / 200.0f, -1.0f, 1.0f);
-        // glm::mat4 projectionMatrix = glm::perspective(glm::radians(50.0f),
-        // (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f); glm::mat4
-        // projectionMatrix;
+            -(float)app.get_width() / 200.0f, (float)app.get_width() / 200.0f,
+            -(float)app.get_height() / 200.0f, (float)app.get_height() / 200.0f, -1.0f,
+            1.0f);
 
         Shader shader("resources/shaders/basic.shader");
         shader.bind();
-        shader.setUniform3f("color", 0.1, 0.6, 1.0);
-        shader.setUniformMat4("mvp", projectionMatrix);
+        shader.set_uniform_3f("color", 0.1, 0.6, 1.0);
+        shader.set_uniform_mat4("mvp", projectionMatrix);
 
         Renderer renderer;
 
         /* Loop until the user closes the window */
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(app.get_window())) {
             renderer.clear(0.1, 0.1, 0.1);
 
-            renderer.draw(vertexArray, indexBuffer, shader);
+            renderer.draw(mesh, shader);
 
             /* Swap front and back buffers */
-            glfwSwapBuffers(window);
+            glfwSwapBuffers(app.get_window());
 
             /* Poll for and process events */
             glfwPollEvents();
